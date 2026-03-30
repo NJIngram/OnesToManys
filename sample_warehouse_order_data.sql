@@ -6,11 +6,11 @@ INSERT INTO warehouse (warehouse_id, name, location) VALUES (2, 'West Coast Hub'
 INSERT INTO warehouse (warehouse_id, name, location) VALUES (3, 'Midwest Depot', 'Chicago');
 
 -- Products
-INSERT INTO product (product_sku, name, description) VALUES ('SKU1001', 'Plankton Net', 'Fine mesh net for collecting plankton samples.');
-INSERT INTO product (product_sku, name, description) VALUES ('SKU1002', 'Water Sampler', 'Device for collecting water samples at various depths.');
-INSERT INTO product (product_sku, name, description) VALUES ('SKU1003', 'Secchi Disk', 'Disk used to measure water transparency.');
-INSERT INTO product (product_sku, name, description) VALUES ('SKU1004', 'Underwater Camera', 'Camera for capturing images and video underwater.');
-INSERT INTO product (product_sku, name, description) VALUES ('SKU1005', 'Dissolved Oxygen Meter', 'Instrument for measuring oxygen levels in water.');
+INSERT INTO product (product_sku, product_name, description) VALUES ('SKU1001', 'Plankton Net', 'Fine mesh net for collecting plankton samples.');
+INSERT INTO product (product_sku, product_name, description) VALUES ('SKU1002', 'Water Sampler', 'Device for collecting water samples at various depths.');
+INSERT INTO product (product_sku, product_name, description) VALUES ('SKU1003', 'Secchi Disk', 'Disk used to measure water transparency.');
+INSERT INTO product (product_sku, product_name, description) VALUES ('SKU1004', 'Underwater Camera', 'Camera for capturing images and video underwater.');
+INSERT INTO product (product_sku, product_name, description) VALUES ('SKU1005', 'Dissolved Oxygen Meter', 'Instrument for measuring oxygen levels in water.');
 
 -- Warehouse Orders
 INSERT INTO warehouse_order (order_id, warehouse_id, order_date, status) VALUES (1, 1, '2026-03-01', 'Pending');

@@ -32,6 +32,6 @@ CREATE TABLE warehouse (
 -- Optional: Product table for reference
 CREATE TABLE product (
     product_sku TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
+    product_name TEXT NOT NULL,
     description TEXT
 );
