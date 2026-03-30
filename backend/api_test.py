@@ -25,7 +25,7 @@ print_response(r)
 warehouse_id = r.json()[0]["warehouse_id"]
 
 # 3. Create Product
-data = {"product_sku": "SKU1001", "product_name": "Plankton Net", "description": "Fine mesh net for collecting plankton samples.", "unit_price": 5.99}
+data = {"product_sku": "SKU1001", "product_name": "Plankton Net", "description": "Fine mesh net for collecting plankton samples."}
 r = requests.post(f"{BASE_URL}/products/", json=data)
 print_response(r)
 
