@@ -112,6 +112,168 @@ class WarehouseOrderSchema(BaseModel):
 	invoice_subtotal: float
 	model_config = ConfigDict(from_attributes=True)
 
+# --- CRUD Endpoints ---
+
+# Warehouse CRUD
+@app.post("/warehouses/", response_model=WarehouseSchema)
+def create_warehouse(warehouse: WarehouseSchema, db: Session = Depends(get_db)):
+    db_warehouse = Warehouse(**warehouse.dict())
+    db.add(db_warehouse)
+    db.commit()
+    db.refresh(db_warehouse)
+    return db_warehouse
+
+@app.get("/warehouses/", response_model=List[WarehouseSchema])
+def read_warehouses(db: Session = Depends(get_db)):
+    return db.query(Warehouse).all()
+
+@app.get("/warehouses/{warehouse_id}", response_model=WarehouseSchema)
+def read_warehouse(warehouse_id: int, db: Session = Depends(get_db)):
+    warehouse = db.query(Warehouse).filter(Warehouse.warehouse_id == warehouse_id).first()
+    if not warehouse:
+        raise HTTPException(status_code=404, detail="Warehouse not found")
+    return warehouse
+
+@app.put("/warehouses/{warehouse_id}", response_model=WarehouseSchema)
+def update_warehouse(warehouse_id: int, warehouse: WarehouseSchema, db: Session = Depends(get_db)):
+    db_warehouse = db.query(Warehouse).filter(Warehouse.warehouse_id == warehouse_id).first()
+    if not db_warehouse:
+        raise HTTPException(status_code=404, detail="Warehouse not found")
+    for k, v in warehouse.dict().items():
+        setattr(db_warehouse, k, v)
+    db.commit()
+    db.refresh(db_warehouse)
+    return db_warehouse
+
+@app.delete("/warehouses/{warehouse_id}")
+def delete_warehouse(warehouse_id: int, db: Session = Depends(get_db)):
+    db_warehouse = db.query(Warehouse).filter(Warehouse.warehouse_id == warehouse_id).first()
+    if not db_warehouse:
+        raise HTTPException(status_code=404, detail="Warehouse not found")
+    db.delete(db_warehouse)
+    db.commit()
+    return {"ok": True}
+
+# Product CRUD
+@app.post("/products/", response_model=ProductSchema)
+def create_product(product: ProductSchema, db: Session = Depends(get_db)):
+    db_product = Product(**product.dict())
+    db.add(db_product)
+    db.commit()
+    db.refresh(db_product)
+    return db_product
+
+@app.get("/products/", response_model=List[ProductSchema])
+def read_products(db: Session = Depends(get_db)):
+    return db.query(Product).all()
+
+@app.get("/products/{product_sku}", response_model=ProductSchema)
+def read_product(product_sku: str, db: Session = Depends(get_db)):
+    product = db.query(Product).filter(Product.product_sku == product_sku).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return product
+
+@app.put("/products/{product_sku}", response_model=ProductSchema)
+def update_product(product_sku: str, product: ProductSchema, db: Session = Depends(get_db)):
+    db_product = db.query(Product).filter(Product.product_sku == product_sku).first()
+    if not db_product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    for k, v in product.dict().items():
+        setattr(db_product, k, v)
+    db.commit()
+    db.refresh(db_product)
+    return db_product
+
+@app.delete("/products/{product_sku}")
+def delete_product(product_sku: str, db: Session = Depends(get_db)):
+    db_product = db.query(Product).filter(Product.product_sku == product_sku).first()
+    if not db_product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    db.delete(db_product)
+    db.commit()
+    return {"ok": True}
+
+# WarehouseOrder CRUD
+@app.post("/orders/", response_model=WarehouseOrderSchema)
+def create_order(order: WarehouseOrderSchema, db: Session = Depends(get_db)):
+    db_order = WarehouseOrder(**order.dict())
+    db.add(db_order)
+    db.commit()
+    db.refresh(db_order)
+    return db_order
+
+@app.get("/orders/", response_model=List[WarehouseOrderSchema])
+def read_orders(db: Session = Depends(get_db)):
+    return db.query(WarehouseOrder).all()
+
+@app.get("/orders/{order_id}", response_model=WarehouseOrderSchema)
+def read_order(order_id: int, db: Session = Depends(get_db)):
+    order = db.query(WarehouseOrder).filter(WarehouseOrder.order_id == order_id).first()
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    return order
+
+@app.put("/orders/{order_id}", response_model=WarehouseOrderSchema)
+def update_order(order_id: int, order: WarehouseOrderSchema, db: Session = Depends(get_db)):
+    db_order = db.query(WarehouseOrder).filter(WarehouseOrder.order_id == order_id).first()
+    if not db_order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    for k, v in order.dict().items():
+        setattr(db_order, k, v)
+    db.commit()
+    db.refresh(db_order)
+    return db_order
+
+@app.delete("/orders/{order_id}")
+def delete_order(order_id: int, db: Session = Depends(get_db)):
+    db_order = db.query(WarehouseOrder).filter(WarehouseOrder.order_id == order_id).first()
+    if not db_order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    db.delete(db_order)
+    db.commit()
+    return {"ok": True}
+
+# WarehouseOrderItem CRUD
+@app.post("/order_items/", response_model=WarehouseOrderItemSchema)
+def create_order_item(item: WarehouseOrderItemSchema, db: Session = Depends(get_db)):
+    db_item = WarehouseOrderItem(**item.dict())
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
+
+@app.get("/order_items/", response_model=List[WarehouseOrderItemSchema])
+def read_order_items(db: Session = Depends(get_db)):
+    return db.query(WarehouseOrderItem).all()
+
+@app.get("/order_items/{item_id}", response_model=WarehouseOrderItemSchema)
+def read_order_item(item_id: int, db: Session = Depends(get_db)):
+    item = db.query(WarehouseOrderItem).filter(WarehouseOrderItem.item_id == item_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Order item not found")
+    return item
+
+@app.put("/order_items/{item_id}", response_model=WarehouseOrderItemSchema)
+def update_order_item(item_id: int, item: WarehouseOrderItemSchema, db: Session = Depends(get_db)):
+    db_item = db.query(WarehouseOrderItem).filter(WarehouseOrderItem.item_id == item_id).first()
+    if not db_item:
+        raise HTTPException(status_code=404, detail="Order item not found")
+    for k, v in item.dict().items():
+        setattr(db_item, k, v)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
+
+@app.delete("/order_items/{item_id}")
+def delete_order_item(item_id: int, db: Session = Depends(get_db)):
+    db_item = db.query(WarehouseOrderItem).filter(WarehouseOrderItem.item_id == item_id).first()
+    if not db_item:
+        raise HTTPException(status_code=404, detail="Order item not found")
+    db.delete(db_item)
+    db.commit()
+    return {"ok": True}
+
 def get_db():
 	db = SessionLocal()
 	try:
