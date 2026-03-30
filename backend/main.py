@@ -1,11 +1,10 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine, Column, Integer, String, Date, Text, ForeignKey, DECIMAL, TIMESTAMP
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship, Session
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship, Session
 from typing import List, Optional
 import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 DATABASE_URL = "sqlite:///../warehouse_orders.db"
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
@@ -77,16 +76,14 @@ class WarehouseSchema(BaseModel):
 	warehouse_id: int
 	name: str
 	location: Optional[str]
-	class Config:
-		orm_mode = True
+	model_config = ConfigDict(from_attributes=True)
 
 class ProductSchema(BaseModel):
 	product_sku: str
 	product_name: str
 	description: Optional[str]
 	unit_price: float
-	class Config:
-		orm_mode = True
+	model_config = ConfigDict(from_attributes=True)
 
 class WarehouseOrderItemSchema(BaseModel):
 	item_id: int
@@ -95,8 +92,7 @@ class WarehouseOrderItemSchema(BaseModel):
 	quantity: int
 	unit_price: float
 	extended_cost: float
-	class Config:
-		orm_mode = True
+	model_config = ConfigDict(from_attributes=True)
 
 class WarehouseOrderSchema(BaseModel):
 	order_id: int
@@ -105,8 +101,7 @@ class WarehouseOrderSchema(BaseModel):
 	status: str
 	created_at: Optional[datetime.datetime]
 	invoice_subtotal: float
-	class Config:
-		orm_mode = True
+	model_config = ConfigDict(from_attributes=True)
 
 def get_db():
 	db = SessionLocal()
