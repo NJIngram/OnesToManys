@@ -111,6 +111,14 @@ class WarehouseOrderSchema(BaseModel):
 	created_at: Optional[datetime.datetime]
 	invoice_subtotal: float
 	model_config = ConfigDict(from_attributes=True)
+     
+def get_db():
+	db = SessionLocal()
+	try:
+		yield db
+	finally:
+		db.close()
+
 
 # --- CRUD Endpoints ---
 
@@ -274,9 +282,3 @@ def delete_order_item(item_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"ok": True}
 
-def get_db():
-	db = SessionLocal()
-	try:
-		yield db
-	finally:
-		db.close()
