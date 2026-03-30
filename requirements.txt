@@ -1,0 +1,9 @@
+# Python requirements for ListDetails (Warehouse Order Log)
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+sqlite3 # (built-in for Python 3.x, included for clarity)
+pytest
+httpx # for API testing
+python-dotenv # for environment variable management
