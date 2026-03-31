@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import create_engine, Column, Integer, String, Date, Text, ForeignKey, DECIMAL, TIMESTAMP
+from sqlalchemy import create_engine, Column, Integer, String, Date, Text, ForeignKey, DECIMAL, TIMESTAMP, text
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship, Session
 from typing import List, Optional
 import datetime
@@ -283,6 +283,18 @@ def delete_order_item(item_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"ok": True}
 
+# --- Nested Endpoints for One-to-Many Navigation ---
+
+@app.get("/warehouses/{warehouse_id}/orders", response_model=List[WarehouseOrderSchema])
+def get_orders_for_warehouse(warehouse_id: int, db: Session = Depends(get_db)):
+    orders = db.query(WarehouseOrder).filter(WarehouseOrder.warehouse_id == warehouse_id).all()
+    return orders
+
+@app.get("/orders/{order_id}/items", response_model=List[WarehouseOrderItemSchema])
+def get_items_for_order(order_id: int, db: Session = Depends(get_db)):
+    items = db.query(WarehouseOrderItem).filter(WarehouseOrderItem.order_id == order_id).all()
+    return items
+
 # --- Utility to import schema and sample data ---
 def run_sql_file(engine, filepath):
     if not os.path.exists(filepath):
@@ -293,8 +305,10 @@ def run_sql_file(engine, filepath):
     with engine.begin() as conn:
         for statement in sql.split(";"):
             stmt = statement.strip()
-            if stmt:
-                conn.execute(stmt)
+            # Skip empty statements and comments
+            if not stmt or stmt.startswith('--'):
+                continue
+            conn.execute(text(stmt))
         print(f"Executed SQL from {filepath}")
 
 run_sql_file(engine, os.path.join(os.path.dirname(__file__), '../warehouse_order_log_schema.sql'))
