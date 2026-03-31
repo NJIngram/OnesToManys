@@ -5,6 +5,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker, relationship, Session
 from typing import List, Optional
 import datetime
 from pydantic import BaseModel, ConfigDict
+import os
 
 app = FastAPI()
 app.add_middleware(
@@ -281,4 +282,22 @@ def delete_order_item(item_id: int, db: Session = Depends(get_db)):
     db.delete(db_item)
     db.commit()
     return {"ok": True}
+
+# --- Utility to import schema and sample data ---
+def run_sql_file(engine, filepath):
+    if not os.path.exists(filepath):
+        print(f"File not found: {filepath}")
+        return
+    with open(filepath, "r") as f:
+        sql = f.read()
+    with engine.begin() as conn:
+        for statement in sql.split(";"):
+            stmt = statement.strip()
+            if stmt:
+                conn.execute(stmt)
+        print(f"Executed SQL from {filepath}")
+
+# --- Uncomment the following lines to import schema and sample data ---
+# run_sql_file(engine, os.path.join(os.path.dirname(__file__), '../warehouse_order_log_schema.sql'))
+# run_sql_file(engine, os.path.join(os.path.dirname(__file__), '../sample_warehouse_order_data.sql'))
 
