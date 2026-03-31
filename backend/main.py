@@ -297,7 +297,6 @@ def run_sql_file(engine, filepath):
                 conn.execute(stmt)
         print(f"Executed SQL from {filepath}")
 
-# --- Uncomment the following lines to import schema and sample data ---
-# run_sql_file(engine, os.path.join(os.path.dirname(__file__), '../warehouse_order_log_schema.sql'))
-# run_sql_file(engine, os.path.join(os.path.dirname(__file__), '../sample_warehouse_order_data.sql'))
+run_sql_file(engine, os.path.join(os.path.dirname(__file__), '../warehouse_order_log_schema.sql'))
+run_sql_file(engine, os.path.join(os.path.dirname(__file__), '../sample_warehouse_order_data.sql'))
 
