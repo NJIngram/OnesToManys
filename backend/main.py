@@ -6,6 +6,7 @@ from typing import List, Optional
 import datetime
 from pydantic import BaseModel, ConfigDict
 import os
+import sys
 
 app = FastAPI()
 app.add_middleware(
@@ -328,6 +329,14 @@ def run_sql_file(engine, filepath):
 
 run_sql_file(engine, os.path.join(os.path.dirname(__file__), '../warehouse_order_log_schema.sql'))
 run_sql_file(engine, os.path.join(os.path.dirname(__file__), '../sample_warehouse_order_data.sql'))
+
+# Allow 'from backend.X import ...' to work when this file is run directly.
+# Without this, json_api.py's 'from backend.main import ...' would load main.py
+# a second time as a separate module, causing duplicate SQLAlchemy registrations.
+_project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _project_root not in sys.path:
+    sys.path.insert(0, _project_root)
+sys.modules.setdefault('backend.main', sys.modules[__name__])
 
 from backend.json_api import router as json_router
 app.include_router(json_router)
