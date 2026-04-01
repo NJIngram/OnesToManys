@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouses</title>
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a> |
+        <a href="warehouses.html"><b>Warehouses</b></a> |
+        <a href="products.html">Products</a> |
+        <a href="orders.html">Orders</a>
+    </nav>
+    <h1>Warehouses</h1>
+    <button id="btn-add">+ Add Warehouse</button>
+    <p id="error" style="color:red;display:none;"></p>
+
+    <table border="1" cellpadding="6" id="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+    </table>
+
+    <hr>
+    <h2>Orders for Warehouse <span id="selected-name">—</span></h2>
+    <p id="orders-hint" style="color:#888;">Click a warehouse row to see its orders.</p>
+    <table border="1" cellpadding="6" id="orders-table" style="display:none;">
+        <thead>
+            <tr><th>Order ID</th><th>Date</th><th>Status</th><th>Subtotal</th></tr>
+        </thead>
+        <tbody id="orders-tbody"></tbody>
+    </table>
+
+    <!-- Modal -->
+    <div id="modal" style="display:none; position:fixed; top:30%; left:50%; transform:translateX(-50%); background:white; border:1px solid #ccc; padding:20px; z-index:10;">
+        <h3 id="modal-title">Warehouse</h3>
+        <label>Name: <input id="field-name" type="text"></label><br><br>
+        <label>Location: <input id="field-location" type="text"></label><br><br>
+        <button id="modal-save">Save</button>
+        <button id="modal-cancel">Cancel</button>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/warehouses.js"></script>
+</body>
+</html>

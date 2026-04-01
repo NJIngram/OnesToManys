@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouse Orders</title>
+</head>
+<body>
+    <nav>
+        <a class="brand" href="index.html">Warehouse Orders</a>
+        <a href="warehouses.html">Warehouses</a>
+        <a href="products.html">Products</a>
+        <a href="orders.html">Orders</a>
+    </nav>
+    <div class="page">
+        <h1>Dashboard</h1>
+        <div id="cards-container">
+            <div class="cards">
+                <a class="card" href="warehouses.html">
+                    <div class="count" id="count-warehouses">—</div>
+                    <div class="label">Warehouses</div>
+                </a>
+                <a class="card" href="products.html">
+                    <div class="count" id="count-products">—</div>
+                    <div class="label">Products</div>
+                </a>
+                <a class="card" href="orders.html">
+                    <div class="count" id="count-orders">—</div>
+                    <div class="label">Orders</div>
+                </a>
+                <a class="card" href="orders.html">
+                    <div class="count" id="count-items">—</div>
+                    <div class="label">Order Items</div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <script src="js/api.js"></script>
+    <script>
+        Promise.all([
+            api.getWarehouses(),
+            api.getProducts(),
+            api.getOrders(),
+            api.getAllOrderItems()
+        ]).then(([w, p, o, i]) => {
+            document.getElementById('count-warehouses').textContent = w.length;
+            document.getElementById('count-products').textContent   = p.length;
+            document.getElementById('count-orders').textContent     = o.length;
+            document.getElementById('count-items').textContent      = i.length;
+        }).catch(() => {
+            document.getElementById('cards-container').innerHTML =
+                '<p class="error">Could not connect to the API. Make sure the server is running on port 8000.</p>';
+        });
+    </script>
+</body>
+</html>

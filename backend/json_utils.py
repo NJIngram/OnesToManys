@@ -2,7 +2,7 @@ import json
 import decimal
 import datetime
 from sqlalchemy.orm import Session
-from backend.main import Warehouse, Product, WarehouseOrder, WarehouseOrderItem
+from backend.models import Warehouse, Product, WarehouseOrder, WarehouseOrderItem
 
 def _json_default(obj):
     if isinstance(obj, decimal.Decimal):
