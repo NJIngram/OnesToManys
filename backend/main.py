@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict
 import os
 import sys
 
-app = FastAPI()
+app = FastAPI(swagger_ui_parameters={"defaultModelsExpandDepth": -1})
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -17,7 +17,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-DATABASE_URL = "sqlite:///../warehouse_orders.db"
+_db_path = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'warehouse_orders.db'))
+DATABASE_URL = f"sqlite:///{_db_path}"
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -327,8 +328,44 @@ def run_sql_file(engine, filepath):
             conn.execute(text(stmt))
         print(f"Executed SQL from {filepath}")
 
-run_sql_file(engine, os.path.join(os.path.dirname(__file__), '../warehouse_order_log_schema.sql'))
-run_sql_file(engine, os.path.join(os.path.dirname(__file__), '../sample_warehouse_order_data.sql'))
+def _sql_fingerprint(*filepaths):
+    import hashlib
+    h = hashlib.md5()
+    for fp in filepaths:
+        if os.path.exists(fp):
+            with open(fp, "rb") as f:
+                h.update(f.read())
+    return h.hexdigest()
+
+def _reset_and_seed(engine):
+    """Drop all tables, recreate them, and load sample data."""
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    run_sql_file(engine, os.path.join(os.path.dirname(__file__), '../warehouse_order_log_schema.sql'))
+    run_sql_file(engine, os.path.join(os.path.dirname(__file__), '../sample_warehouse_order_data.sql'))
+
+_schema_file  = os.path.join(os.path.dirname(__file__), '../warehouse_order_log_schema.sql')
+_data_file    = os.path.join(os.path.dirname(__file__), '../sample_warehouse_order_data.sql')
+_current_hash = _sql_fingerprint(_schema_file, _data_file)
+
+# Check whether the DB is already seeded with the current SQL files.
+# Uses a single-row _schema_version table as a version stamp.
+try:
+    with engine.connect() as _conn:
+        _stored = _conn.execute(text("SELECT hash FROM _schema_version LIMIT 1")).scalar()
+except Exception:
+    _stored = None
+
+if _stored != _current_hash:
+    print("Schema or data files changed — resetting database.")
+    _reset_and_seed(engine)
+    with engine.begin() as _conn:
+        _conn.execute(text("CREATE TABLE IF NOT EXISTS _schema_version (hash TEXT)"))
+        _conn.execute(text("DELETE FROM _schema_version"))
+        _conn.execute(text("INSERT INTO _schema_version (hash) VALUES (:h)"), {"h": _current_hash})
+    print("Database reset and seeded.")
+else:
+    print("Database is up to date.")
 
 # Allow 'from backend.X import ...' to work when this file is run directly.
 # Without this, json_api.py's 'from backend.main import ...' would load main.py
@@ -340,4 +377,18 @@ sys.modules.setdefault('backend.main', sys.modules[__name__])
 
 from backend.json_api import router as json_router
 app.include_router(json_router)
+
+if __name__ == "__main__":
+    import threading
+    import webbrowser
+    import uvicorn
+
+    host = "127.0.0.1"
+    port = 8000
+
+    def open_browser():
+        webbrowser.open(f"http://{host}:{port}/redoc")
+
+    threading.Timer(1.0, open_browser).start()
+    uvicorn.run(app, host=host, port=port)
 

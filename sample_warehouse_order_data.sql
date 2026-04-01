@@ -6,11 +6,11 @@ INSERT OR IGNORE INTO warehouse (warehouse_id, name, location) VALUES (2, 'West 
 INSERT OR IGNORE INTO warehouse (warehouse_id, name, location) VALUES (3, 'Midwest Depot', 'Chicago');
 
 -- Products
-INSERT OR IGNORE INTO product (product_sku, product_name, description) VALUES ('SKU1001', 'Plankton Net', 'Fine mesh net for collecting plankton samples.');
-INSERT OR IGNORE INTO product (product_sku, product_name, description) VALUES ('SKU1002', 'Water Sampler', 'Device for collecting water samples at various depths.');
-INSERT OR IGNORE INTO product (product_sku, product_name, description) VALUES ('SKU1003', 'Secchi Disk', 'Disk used to measure water transparency.');
-INSERT OR IGNORE INTO product (product_sku, product_name, description) VALUES ('SKU1004', 'Underwater Camera', 'Camera for capturing images and video underwater.');
-INSERT OR IGNORE INTO product (product_sku, product_name, description) VALUES ('SKU1005', 'Dissolved Oxygen Meter', 'Instrument for measuring oxygen levels in water.');
+INSERT OR IGNORE INTO product (product_sku, product_name, description, unit_price) VALUES ('SKU1001', 'Plankton Net', 'Fine mesh net for collecting plankton samples.', 5.99);
+INSERT OR IGNORE INTO product (product_sku, product_name, description, unit_price) VALUES ('SKU1002', 'Water Sampler', 'Device for collecting water samples at various depths.', 8.49);
+INSERT OR IGNORE INTO product (product_sku, product_name, description, unit_price) VALUES ('SKU1003', 'Secchi Disk', 'Disk used to measure water transparency.', 12.99);
+INSERT OR IGNORE INTO product (product_sku, product_name, description, unit_price) VALUES ('SKU1004', 'Underwater Camera', 'Camera for capturing images and video underwater.', 15.99);
+INSERT OR IGNORE INTO product (product_sku, product_name, description, unit_price) VALUES ('SKU1005', 'Dissolved Oxygen Meter', 'Instrument for measuring oxygen levels in water.', 22.50);
 
 -- Warehouse Orders
 INSERT OR IGNORE INTO warehouse_order (order_id, warehouse_id, order_date, status) VALUES (1, 1, '2026-03-01', 'Pending');

@@ -2,7 +2,7 @@
 -- Schema for Warehouse Order Log (Master-Detail)
 
 -- Master table: WarehouseOrder
-CREATE TABLE warehouse_order (
+CREATE TABLE IF NOT EXISTS warehouse_order (
     order_id INTEGER PRIMARY KEY AUTOINCREMENT,
     warehouse_id INTEGER NOT NULL,
     order_date DATE NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE warehouse_order (
 );
 
 -- Detail table: WarehouseOrderItem
-CREATE TABLE warehouse_order_item (
+CREATE TABLE IF NOT EXISTS warehouse_order_item (
     item_id INTEGER PRIMARY KEY AUTOINCREMENT,
     order_id INTEGER NOT NULL,
     product_sku TEXT NOT NULL,
@@ -23,15 +23,16 @@ CREATE TABLE warehouse_order_item (
 );
 
 -- Optional: Warehouse table for reference
-CREATE TABLE warehouse (
+CREATE TABLE IF NOT EXISTS warehouse (
     warehouse_id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     location TEXT
 );
 
 -- Optional: Product table for reference
-CREATE TABLE product (
+CREATE TABLE IF NOT EXISTS product (
     product_sku TEXT PRIMARY KEY,
     product_name TEXT NOT NULL,
-    description TEXT
+    description TEXT,
+    unit_price DECIMAL(10,2) NOT NULL
 );
