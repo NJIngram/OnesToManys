@@ -11,7 +11,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -112,7 +112,22 @@ class WarehouseOrderSchema(BaseModel):
 	created_at: Optional[datetime.datetime]
 	invoice_subtotal: float
 	model_config = ConfigDict(from_attributes=True)
-     
+
+class WarehouseCreateSchema(BaseModel):
+	name: str
+	location: Optional[str] = None
+
+class WarehouseOrderCreateSchema(BaseModel):
+	warehouse_id: int
+	order_date: datetime.date
+	status: str
+
+class WarehouseOrderItemCreateSchema(BaseModel):
+	order_id: int
+	product_sku: str
+	quantity: int
+	unit_price: float
+
 def get_db():
 	db = SessionLocal()
 	try:
@@ -125,8 +140,8 @@ def get_db():
 
 # Warehouse CRUD
 @app.post("/warehouses/", response_model=WarehouseSchema)
-def create_warehouse(warehouse: WarehouseSchema, db: Session = Depends(get_db)):
-    db_warehouse = Warehouse(**warehouse.dict())
+def create_warehouse(warehouse: WarehouseCreateSchema, db: Session = Depends(get_db)):
+    db_warehouse = Warehouse(**warehouse.model_dump())
     db.add(db_warehouse)
     db.commit()
     db.refresh(db_warehouse)
@@ -144,11 +159,11 @@ def read_warehouse(warehouse_id: int, db: Session = Depends(get_db)):
     return warehouse
 
 @app.put("/warehouses/{warehouse_id}", response_model=WarehouseSchema)
-def update_warehouse(warehouse_id: int, warehouse: WarehouseSchema, db: Session = Depends(get_db)):
+def update_warehouse(warehouse_id: int, warehouse: WarehouseCreateSchema, db: Session = Depends(get_db)):
     db_warehouse = db.query(Warehouse).filter(Warehouse.warehouse_id == warehouse_id).first()
     if not db_warehouse:
         raise HTTPException(status_code=404, detail="Warehouse not found")
-    for k, v in warehouse.dict().items():
+    for k, v in warehouse.model_dump().items():
         setattr(db_warehouse, k, v)
     db.commit()
     db.refresh(db_warehouse)
@@ -166,7 +181,7 @@ def delete_warehouse(warehouse_id: int, db: Session = Depends(get_db)):
 # Product CRUD
 @app.post("/products/", response_model=ProductSchema)
 def create_product(product: ProductSchema, db: Session = Depends(get_db)):
-    db_product = Product(**product.dict())
+    db_product = Product(**product.model_dump())
     db.add(db_product)
     db.commit()
     db.refresh(db_product)
@@ -188,7 +203,7 @@ def update_product(product_sku: str, product: ProductSchema, db: Session = Depen
     db_product = db.query(Product).filter(Product.product_sku == product_sku).first()
     if not db_product:
         raise HTTPException(status_code=404, detail="Product not found")
-    for k, v in product.dict().items():
+    for k, v in product.model_dump().items():
         setattr(db_product, k, v)
     db.commit()
     db.refresh(db_product)
@@ -205,8 +220,8 @@ def delete_product(product_sku: str, db: Session = Depends(get_db)):
 
 # WarehouseOrder CRUD
 @app.post("/orders/", response_model=WarehouseOrderSchema)
-def create_order(order: WarehouseOrderSchema, db: Session = Depends(get_db)):
-    db_order = WarehouseOrder(**order.dict())
+def create_order(order: WarehouseOrderCreateSchema, db: Session = Depends(get_db)):
+    db_order = WarehouseOrder(**order.model_dump())
     db.add(db_order)
     db.commit()
     db.refresh(db_order)
@@ -224,11 +239,11 @@ def read_order(order_id: int, db: Session = Depends(get_db)):
     return order
 
 @app.put("/orders/{order_id}", response_model=WarehouseOrderSchema)
-def update_order(order_id: int, order: WarehouseOrderSchema, db: Session = Depends(get_db)):
+def update_order(order_id: int, order: WarehouseOrderCreateSchema, db: Session = Depends(get_db)):
     db_order = db.query(WarehouseOrder).filter(WarehouseOrder.order_id == order_id).first()
     if not db_order:
         raise HTTPException(status_code=404, detail="Order not found")
-    for k, v in order.dict().items():
+    for k, v in order.model_dump().items():
         setattr(db_order, k, v)
     db.commit()
     db.refresh(db_order)
@@ -245,8 +260,8 @@ def delete_order(order_id: int, db: Session = Depends(get_db)):
 
 # WarehouseOrderItem CRUD
 @app.post("/order_items/", response_model=WarehouseOrderItemSchema)
-def create_order_item(item: WarehouseOrderItemSchema, db: Session = Depends(get_db)):
-    db_item = WarehouseOrderItem(**item.dict())
+def create_order_item(item: WarehouseOrderItemCreateSchema, db: Session = Depends(get_db)):
+    db_item = WarehouseOrderItem(**item.model_dump())
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
@@ -264,11 +279,11 @@ def read_order_item(item_id: int, db: Session = Depends(get_db)):
     return item
 
 @app.put("/order_items/{item_id}", response_model=WarehouseOrderItemSchema)
-def update_order_item(item_id: int, item: WarehouseOrderItemSchema, db: Session = Depends(get_db)):
+def update_order_item(item_id: int, item: WarehouseOrderItemCreateSchema, db: Session = Depends(get_db)):
     db_item = db.query(WarehouseOrderItem).filter(WarehouseOrderItem.item_id == item_id).first()
     if not db_item:
         raise HTTPException(status_code=404, detail="Order item not found")
-    for k, v in item.dict().items():
+    for k, v in item.model_dump().items():
         setattr(db_item, k, v)
     db.commit()
     db.refresh(db_item)
@@ -313,4 +328,7 @@ def run_sql_file(engine, filepath):
 
 run_sql_file(engine, os.path.join(os.path.dirname(__file__), '../warehouse_order_log_schema.sql'))
 run_sql_file(engine, os.path.join(os.path.dirname(__file__), '../sample_warehouse_order_data.sql'))
+
+from backend.json_api import router as json_router
+app.include_router(json_router)
 

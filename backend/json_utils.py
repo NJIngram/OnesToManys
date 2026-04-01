@@ -1,6 +1,15 @@
 import json
+import decimal
+import datetime
 from sqlalchemy.orm import Session
-from backend.main import Warehouse, Product, WarehouseOrder, WarehouseOrderItem, get_db
+from backend.main import Warehouse, Product, WarehouseOrder, WarehouseOrderItem
+
+def _json_default(obj):
+    if isinstance(obj, decimal.Decimal):
+        return float(obj)
+    if isinstance(obj, (datetime.date, datetime.datetime)):
+        return obj.isoformat()
+    raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
 
 # Export all data to JSON file
 def export_all_to_json(json_path: str, db: Session):
@@ -18,7 +27,7 @@ def export_all_to_json(json_path: str, db: Session):
         for row in table:
             row.pop('_sa_instance_state', None)
     with open(json_path, 'w') as f:
-        json.dump(data, f, indent=2)
+        json.dump(data, f, indent=2, default=_json_default)
     print(f"Exported all data to {json_path}")
 
 # Import all data from JSON file
