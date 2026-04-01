@@ -10,15 +10,47 @@ const CARDS = [
     { key: 'items',      label: 'Order Items', to: null,          icon: '[I]' },
 ];
 
+function Bar({ value, max, color }) {
+    const pct = max > 0 ? Math.round((value / max) * 100) : 0;
+    return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ flex: 1, background: '#0a1a0a', height: '10px', border: `1px solid ${C.border}` }}>
+                <div style={{ width: `${pct}%`, height: '100%', background: color, boxShadow: `0 0 6px ${color}`, transition: 'width 0.4s ease' }} />
+            </div>
+            <span style={{ fontFamily: C.font, fontSize: '10px', color: C.muted, minWidth: '32px', textAlign: 'right' }}>{pct}%</span>
+        </div>
+    );
+}
+
 export default function Dashboard() {
     const [counts, setCounts] = useState({ warehouses: null, products: null, orders: null, items: null });
+    const [warehouseStats, setWarehouseStats] = useState([]);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        Promise.all([api.getWarehouses(), api.getProducts(), api.getOrders(), api.getAllOrderItems()])
-            .then(([w, p, o, i]) => setCounts({ warehouses: w.length, products: p.length, orders: o.length, items: i.length }))
-            .catch(() => setError('SIGNAL LOST — Could not connect to API on port 8000.'));
-    }, []);
+    useEffect(() => { loadAll(); }, []);
+
+    async function loadAll() {
+        try {
+            const [warehouses, products, orders, items] = await Promise.all([
+                api.getWarehouses(), api.getProducts(), api.getOrders(), api.getAllOrderItems()
+            ]);
+            setCounts({ warehouses: warehouses.length, products: products.length, orders: orders.length, items: items.length });
+
+            const statsRaw = await Promise.all(
+                warehouses.map(async w => {
+                    const wOrders = await api.getWarehouseOrders(w.warehouse_id);
+                    const total = wOrders.reduce((sum, o) => sum + (o.invoice_subtotal ?? 0), 0);
+                    return { name: w.name, orderCount: wOrders.length, totalValue: total };
+                })
+            );
+            setWarehouseStats(statsRaw);
+        } catch (e) {
+            setError('SIGNAL LOST — Could not connect to API on port 8000.');
+        }
+    }
+
+    const maxOrders = Math.max(...warehouseStats.map(s => s.orderCount), 1);
+    const maxValue  = Math.max(...warehouseStats.map(s => s.totalValue), 1);
 
     return (
         <div style={T.body}>
@@ -54,6 +86,40 @@ export default function Dashboard() {
                         : <div key={key}>{inner}</div>;
                 })}
             </div>
+
+            {warehouseStats.length > 0 && (
+                <div style={{ marginTop: '32px' }}>
+                    <h2 style={T.h2}>WAREHOUSE ACTIVITY COMPARISON</h2>
+                    <table style={T.table}>
+                        <thead>
+                            <tr>
+                                {['Warehouse', 'Orders', 'Order Volume', 'Total Value ($)', 'Value Share'].map(h => (
+                                    <th key={h} style={T.th}>{h}</th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {warehouseStats
+                                .slice()
+                                .sort((a, b) => b.totalValue - a.totalValue)
+                                .map((s, i) => (
+                                    <tr key={s.name} style={{ background: i % 2 === 0 ? 'transparent' : '#050f05' }}>
+                                        <td style={{ ...T.td, color: C.amber }}>{s.name}</td>
+                                        <td style={T.td}>{s.orderCount}</td>
+                                        <td style={{ ...T.td, minWidth: '160px' }}>
+                                            <Bar value={s.orderCount} max={maxOrders} color={C.greenMid} />
+                                        </td>
+                                        <td style={T.td}>${s.totalValue.toFixed(2)}</td>
+                                        <td style={{ ...T.td, minWidth: '160px' }}>
+                                            <Bar value={s.totalValue} max={maxValue} color={C.green} />
+                                        </td>
+                                    </tr>
+                                ))
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            )}
         </div>
     );
 }
