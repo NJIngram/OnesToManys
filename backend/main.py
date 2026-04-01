@@ -35,6 +35,7 @@ Base.metadata.create_all(bind=engine)
 init_db()
 
 if __name__ == "__main__":
+    import subprocess
     import threading
     import webbrowser
     import uvicorn
@@ -42,10 +43,17 @@ if __name__ == "__main__":
     host = "127.0.0.1"
     port = 8000
 
-    def open_browser():
-        webbrowser.open(f"http://{host}:{port}/docs")
+    _frontend_dir = os.path.join(_project_root, "frontend-react")
+    _vite = subprocess.Popen("npm run dev", cwd=_frontend_dir, shell=True)
 
-    threading.Timer(1.0, open_browser).start()
-    uvicorn.run(app, host=host, port=port)
+    def open_browser():
+        webbrowser.open("http://localhost:5173")
+
+    threading.Timer(3.0, open_browser).start()
+
+    try:
+        uvicorn.run(app, host=host, port=port)
+    finally:
+        _vite.terminate()
 
 
