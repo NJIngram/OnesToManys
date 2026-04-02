@@ -120,6 +120,7 @@ export default function Orders() {
             <Btn onClick={openAddOrder}>+ ADD ORDER</Btn>
             {error && <div style={{ ...T.error, marginTop: '12px' }}>{error}</div>}
 
+            <div style={T.tableWrap}>
             <table style={T.table}>
                 <thead>
                     <tr>{['ID', 'Warehouse', 'Date', 'Notes', 'Actions'].map(h => <th key={h} style={T.th}>{h}</th>)}</tr>
@@ -181,8 +182,7 @@ export default function Orders() {
                         </>
                     ))}
                 </tbody>
-            </table>
-
+            </table>            </div>
             {orderModal.open && (
                 <>
                     <div style={T.overlay} onClick={() => setOrderModal({ open: false, data: null })} />

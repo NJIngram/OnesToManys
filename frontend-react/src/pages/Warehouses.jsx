@@ -59,6 +59,7 @@ export default function Warehouses() {
             <Btn onClick={openAdd}>+ ADD WAREHOUSE</Btn>
             {error && <div style={{ ...T.error, marginTop: '12px' }}>{error}</div>}
 
+            <div style={T.tableWrap}>
             <table style={T.table}>
                 <thead>
                     <tr>{['ID', 'Name', 'Location', 'Actions'].map(h => <th key={h} style={T.th}>{h}</th>)}</tr>
@@ -81,8 +82,7 @@ export default function Warehouses() {
                         </tr>
                     ))}
                 </tbody>
-            </table>
-
+            </table>            </div>
             <hr style={T.divider} />
             <h2 style={T.h2}>Orders — {selectedWarehouse ? selectedWarehouse.name.toUpperCase() : 'SELECT A WAREHOUSE'}</h2>
             {!selectedWarehouse && <div style={T.muted}>&gt; Click a warehouse row to load its orders.</div>}

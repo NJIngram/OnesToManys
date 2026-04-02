@@ -159,6 +159,7 @@ export default function Dashboard() {
             {warehouseStats.length > 0 && (
                 <div style={{ marginTop: '32px' }}>
                     <h2 style={T.h2}>WAREHOUSE ACTIVITY COMPARISON</h2>
+                    <div style={T.tableWrap}>
                     <table style={T.table}>
                         <thead>
                             <tr>
@@ -187,6 +188,7 @@ export default function Dashboard() {
                             }
                         </tbody>
                     </table>
+                    </div>
                 </div>
             )}
 

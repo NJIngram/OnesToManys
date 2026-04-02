@@ -24,9 +24,13 @@ export const T = {
         padding: '0',
     },
     body: {
-        maxWidth: '1000px',
+        maxWidth: '1200px',
         margin: '0 auto',
-        padding: '24px 16px',
+        padding: '32px 24px',
+    },
+    tableWrap: {
+        overflowX: 'auto',
+        marginTop: '12px',
     },
     h1: {
         color: C.green,

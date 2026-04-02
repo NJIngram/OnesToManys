@@ -15,22 +15,36 @@ const NAV_LINKS = [
 function Nav() {
     const loc = useLocation();
     return (
-        <nav style={{ background: '#020902', borderBottom: `1px solid ${C.border}`, padding: '10px 24px', display: 'flex', gap: '32px', alignItems: 'center' }}>
-            {NAV_LINKS.map(({ to, label }) => {
-                const active = to === "/" ? loc.pathname === "/" : loc.pathname.startsWith(to);
-                return (
-                    <Link key={to} to={to} style={{
-                        fontFamily: C.font, fontSize: '12px', fontWeight: '700',
-                        letterSpacing: '2px', textDecoration: 'none', textTransform: 'uppercase',
-                        color: active ? C.green : C.muted,
-                        textShadow: active ? `0 0 8px ${C.green}` : 'none',
-                        paddingBottom: '2px',
-                        borderBottom: active ? `1px solid ${C.green}` : '1px solid transparent',
-                    }}>
-                        {label}
-                    </Link>
-                );
-            })}
+        <nav style={{
+            background: '#020902',
+            borderBottom: `1px solid ${C.border}`,
+            boxShadow: `0 2px 12px rgba(76,254,76,0.08)`,
+            padding: '0 24px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'stretch',
+        }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0', maxWidth: '1200px', width: '100%' }}>
+                {NAV_LINKS.map(({ to, label }, idx) => {
+                    const active = to === "/" ? loc.pathname === "/" : loc.pathname.startsWith(to);
+                    const isBrand = idx === 0;
+                    return (
+                        <Link key={to} to={to} style={{
+                            fontFamily: C.font, fontSize: isBrand ? '13px' : '11px', fontWeight: '700',
+                            letterSpacing: isBrand ? '1px' : '3px',
+                            textDecoration: 'none', textTransform: 'uppercase',
+                            color: active ? C.green : C.muted,
+                            textShadow: active ? `0 0 10px ${C.green}` : 'none',
+                            padding: '18px 20px',
+                            borderBottom: active ? `3px solid ${C.green}` : '3px solid transparent',
+                            marginRight: isBrand ? '32px' : '0',
+                            transition: 'color 0.15s, border-color 0.15s',
+                        }}>
+                            {label}
+                        </Link>
+                    );
+                })}
+            </div>
         </nav>
     );
 }

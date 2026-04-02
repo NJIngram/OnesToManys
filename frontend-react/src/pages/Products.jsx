@@ -57,6 +57,7 @@ export default function Products() {
             <Btn onClick={openAdd}>+ ADD PRODUCT</Btn>
             {error && <div style={{ ...T.error, marginTop: '12px' }}>{error}</div>}
 
+            <div style={T.tableWrap}>
             <table style={T.table}>
                 <thead>
                     <tr>{['SKU', 'Name', 'Description', 'Unit Price', 'Actions'].map(h => <th key={h} style={T.th}>{h}</th>)}</tr>
@@ -79,8 +80,7 @@ export default function Products() {
                         </tr>
                     ))}
                 </tbody>
-            </table>
-
+            </table>            </div>
             {modal.open && (
                 <>
                     <div style={T.overlay} onClick={() => setModal({ open: false, data: null })} />
