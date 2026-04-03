@@ -35,6 +35,7 @@ class WarehouseOrderSchema(BaseModel):
     warehouse_id: int
     order_date: datetime.date
     status: str
+    notes: Optional[str] = None
     created_at: Optional[datetime.datetime]
     invoice_subtotal: float
     model_config = ConfigDict(from_attributes=True)
@@ -50,7 +51,8 @@ class WarehouseCreateSchema(BaseModel):
 class WarehouseOrderCreateSchema(BaseModel):
     warehouse_id: int
     order_date: datetime.date
-    status: str
+    status: str = "pending"
+    notes: Optional[str] = None
 
 
 class WarehouseOrderItemCreateSchema(BaseModel):

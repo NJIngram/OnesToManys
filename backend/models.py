@@ -33,6 +33,7 @@ class WarehouseOrder(Base):
     warehouse_id = Column(Integer, ForeignKey("warehouse.warehouse_id"), nullable=False)
     order_date = Column(Date, nullable=False)
     status = Column(String, nullable=False)
+    notes = Column(String, nullable=True)
     created_at = Column(TIMESTAMP, default=datetime.datetime.utcnow)
     warehouse = relationship("Warehouse", back_populates="orders")
     items = relationship("WarehouseOrderItem", back_populates="order")
